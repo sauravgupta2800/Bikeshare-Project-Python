@@ -5,7 +5,8 @@ CITY="'washington'"
 CITY_DATA = { 'chicago': 'chicago.csv',
               'new york city': 'new_york_city.csv',
               'washington': 'washington.csv' }
-
+MONTH_LIST = ['january', 'february', 'march', 'april', 'may', 'june','all']
+DOW_LIST = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday','all']
 def get_filters():
     """
     Asks user to specify a city, month, and day to analyze.
@@ -21,10 +22,15 @@ def get_filters():
     # get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
     while True:
         try:
-            city = input(" Enter the name of the city:(out of chicago/new york city/washington): ")
+            city = input(" Enter the name of the city:(out of chicago/new york city/washington): ").lower()
+            #Now it should accept both "ChicAgo" and "Chicago" input
             if not city:
                 raise ValueError("empty string")
-            break
+            if city in CITY_DATA.keys(): # matching with out CITY_DATA list for validation
+                print("City name is matched :)")
+                break
+            else:
+                print("Your entered city name not in list!!!.....please write again\n")
         except ValueError:
             print("City name is invalid")
         except KeyboardError:
@@ -33,10 +39,14 @@ def get_filters():
     # get user input for month (all, january, february, ... , june)
     while True:
         try:
-            month = input("Enter the name of the month (only first 6 months in full words {ex. january/february/march/april/may/june}): ")
+            month = input("Enter the name of the month (only first 6 months in full words {ex. january/february/march/april/may/june/all}): ").lower()
             if not month:
                 raise ValueError("empty string")
-            break
+            if month in MONTH_LIST: # matching with our MONTH_LIST for validation
+                print("Month name is matched :)")
+                break
+            else:
+                print("Your entered month name not in list!!!.....please write again\n")
         except ValueError:
             print("month name is invalid")
         except KeyboardError:
@@ -45,10 +55,14 @@ def get_filters():
     # get user input for day of week (all, monday, tuesday, ... sunday)
     while True:
         try:
-            day = input("Enter the name of Day of the week (in full words{ex. sunday/monday/tuesday/wednesday/thursday/friday/saturday}): ")
+            day = input("Enter the name of Day of the week (in full words{ex. sunday/monday/tuesday/wednesday/thursday/friday/saturday/all}): ").lower()
             if not day:
                 raise ValueError("empty string")
-            break
+            if day in DOW_LIST: # matching with out DOW_LIST list for validation
+                print("Day name is matched :)")
+                break
+            else:
+                print("Your entered day name is invalid!!!.....please write again\n")
         except ValueError:
             print("day is invalid")
         except KeyboardError:
@@ -148,6 +162,17 @@ def station_stats(df):
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
 
+def time_conversion(sec):
+    """ Converts seconds into -->  Days : Hour : Minutes : Seconds"""
+    day = sec//(24*3600)
+    sec = sec %(24*3600)
+    hour = sec //3600
+    sec%=3600
+    minute = sec //60
+    sec%=60
+    seconds = sec
+    return ("Days : Hour : Minutes : Seconds -> %d : %d : %d : %d"%(day,hour,minute,seconds))
+
 
 def trip_duration_stats(df):
     """Displays statistics on the total and average trip duration."""
@@ -158,11 +183,11 @@ def trip_duration_stats(df):
 
     # display total travel time
     total_travel_time = df["Trip Duration"].sum()
-    print("Total travel time is {} seconds ".format(total_travel_time))
+    print("Total travel time is : ",time_conversion(total_travel_time)) # calling time_conversion() to convert the seconds into days:hour:min:sec
 
     # display mean travel time
     mean_travel_time = df["Trip Duration"].mean()
-    print("Mean travel time is {} seconds ".format(mean_travel_time))
+    print("Mean travel time is : ",time_conversion(mean_travel_time)) # calling time_conversion() to convert the seconds into days:hour:min:sec
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
@@ -200,11 +225,17 @@ def user_stats(df):
         #calculation of most common year of birth
         print("Most common year of birth is {}".format(int(df["Birth Year"].mode()[0])))
 
+    else:
+        print("There is no data related to Gender and Birth Year in this file beacuse of absence of gender and birth column ")
+
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
 
 def correlation(x,y):
     """
+
+    "correlation assuming x and y are independent"
+
     This function computes the correlation between the two input variable
     either a NumPy array or a pandas
 
@@ -221,9 +252,9 @@ def find_correlation(df):
     print('\nCalculating Correlation...\n')
     print("="*80)
 
-    month = df["month"]
+    Trip_Duration = df["Trip Duration"]
     hour = df["hour"]
-    print("correlation b/w month and hour is: "correlation(month,hour))
+    print("correlation b/w Trip_Duration and hour is: ",correlation(Trip_Duration,hour))
 
 
 def main():
